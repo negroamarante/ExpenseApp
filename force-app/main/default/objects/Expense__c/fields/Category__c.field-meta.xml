@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Category__c</fullName>
+    <label>Category</label>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Supermercado</fullName><default
+        >false</default><label>Supermercado</label></value>
+            <value><fullName>Colegio</fullName><default>false</default><label
+        >Colegio</label></value>
+            <value><fullName>Salud</fullName><default>false</default><label
+        >Salud</label></value>
+            <value><fullName>Auto</fullName><default>false</default><label
+        >Auto</label></value>
+            <value><fullName>Hogar</fullName><default>false</default><label
+        >Hogar</label></value>
+            <value><fullName>Ropa</fullName><default>false</default><label
+        >Ropa</label></value>
+            <value><fullName>Entretenimiento</fullName><default
+        >false</default><label>Entretenimiento</label></value>
+            <value><fullName>Servicios</fullName><default>false</default><label
+        >Servicios</label></value>
+            <value><fullName>Otros</fullName><default>false</default><label
+        >Otros</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>End_Date__c</fullName>
+    <label>End Date</label>
+    <description
+  >Mes de la última cuota. Calculado como Purchase_Date__c + (Number_Of_Installments__c - 1) meses.</description>
+    <type>Date</type>
+    <formula
+  >ADDMONTHS(Purchase_Date__c, VALUE(TEXT(Number_Of_Installments__c)) - 1)</formula>
+</CustomField>

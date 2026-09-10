@@ -1,0 +1,35 @@
+<template>
+  <lightning-modal-header label="Editar presupuesto"></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-input
+      type="number"
+      formatter="currency"
+      step="0.01"
+      label="Monto del presupuesto"
+      value={amount}
+      required
+      min="0"
+      onchange={handleAmountChange}
+    ></lightning-input>
+    <template lwc:if={showCopyButton}>
+      <lightning-button
+        label="Copiar del mes anterior"
+        variant="neutral"
+        class="copy-btn"
+        onclick={handleCopyPrevious}
+      ></lightning-button>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancelar"
+      onclick={handleCancel}
+    ></lightning-button>
+    <lightning-button
+      label="Guardar"
+      variant="brand"
+      onclick={handleSave}
+      disabled={isSaving}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

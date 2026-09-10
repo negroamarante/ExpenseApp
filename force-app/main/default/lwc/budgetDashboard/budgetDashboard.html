@@ -1,0 +1,110 @@
+<template>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <div class="month-nav">
+        <lightning-button-icon
+          icon-name="utility:chevronleft"
+          variant="bare"
+          alternative-text="Mes anterior"
+          onclick={handlePrevMonth}
+        ></lightning-button-icon>
+        <span class="month-label">{monthLabel}</span>
+        <lightning-button-icon
+          icon-name="utility:chevronright"
+          variant="bare"
+          alternative-text="Mes siguiente"
+          onclick={handleNextMonth}
+        ></lightning-button-icon>
+      </div>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Cargando"
+          size="medium"
+        ></lightning-spinner>
+      </template>
+      <template lwc:else>
+        <template lwc:if={hasBudget}>
+          <div class={statusClass}>
+            <div class="tile-row">
+              <div class="tile">
+                <div class="tile-label-row">
+                  <p class="tile-label">Presupuesto</p>
+                  <template lwc:if={isNotMobile}>
+                    <lightning-button-icon
+                      icon-name="utility:edit"
+                      variant="bare-inverse"
+                      size="xx-small"
+                      alternative-text="Editar presupuesto"
+                      onclick={handleEditBudget}
+                    ></lightning-button-icon>
+                  </template>
+                </div>
+                <p class="tile-value">
+                  <lightning-formatted-number
+                    value={budgetAmount}
+                    format-style="currency"
+                    currency-code="ARS"
+                    currency-display-as="symbol"
+                  ></lightning-formatted-number>
+                </p>
+              </div>
+              <div class="tile">
+                <p class="tile-label">Comprometido</p>
+                <p class="tile-value">
+                  <lightning-formatted-number
+                    value={committedAmount}
+                    format-style="currency"
+                    currency-code="ARS"
+                    currency-display-as="symbol"
+                  ></lightning-formatted-number>
+                </p>
+              </div>
+            </div>
+            <div class="available-block">
+              <p class="available-icon">{availableIcon}</p>
+              <p class="available-label">Disponible</p>
+              <p class="available-value">
+                <lightning-formatted-number
+                  value={availableAmount}
+                  format-style="currency"
+                  currency-code="ARS"
+                  currency-display-as="symbol"
+                ></lightning-formatted-number>
+              </p>
+              <p class="percent-label">{percentAvailable}% disponible</p>
+            </div>
+          </div>
+        </template>
+        <template lwc:else>
+          <div class="no-budget-banner">
+            <p>Todavía no cargaste el presupuesto de este mes.</p>
+            <lightning-button
+              label="Cargar presupuesto"
+              variant="brand"
+              onclick={handleEditBudget}
+            ></lightning-button>
+          </div>
+        </template>
+      </template>
+    </div>
+
+    <template lwc:if={hasExpenseList}>
+      <div class="dashboard-scroll">
+        <div class="section-header">
+          <h2>Consumos del mes</h2>
+        </div>
+
+        <c-expense-list
+          expenses={expenses}
+          onedit={handleEditExpense}
+          ondelete={handleDeleteExpense}
+        ></c-expense-list>
+      </div>
+    </template>
+
+    <button class="fab" onclick={handleAddExpense} title="Nuevo consumo">
+      +
+    </button>
+  </div>
+</template>

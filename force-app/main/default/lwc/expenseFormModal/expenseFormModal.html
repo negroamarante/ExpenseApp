@@ -1,0 +1,116 @@
+<template>
+  <lightning-modal-header label={modalTitle}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Cargando"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:else>
+      <div class="receipt-scan-section">
+        <input
+          id="receipt-input"
+          type="file"
+          accept="image/*"
+          disabled={isScanning}
+          onchange={handleReceiptFileChange}
+          class="receipt-input"
+        />
+        <label for="receipt-input" class="receipt-upload-button">
+          <lightning-icon
+            icon-name="utility:upload"
+            size="x-small"
+          ></lightning-icon>
+          <span>Escanear ticket</span>
+        </label>
+        <template lwc:if={receiptFileName}>
+          <p class="receipt-file-name">📎 {receiptFileName}</p>
+        </template>
+        <template lwc:if={isScanning}>
+          <lightning-spinner
+            alternative-text="Leyendo ticket..."
+            size="small"
+          ></lightning-spinner>
+        </template>
+      </div>
+      <lightning-input
+        data-field="description"
+        label="Descripción"
+        value={expenseDescription}
+        required
+        onchange={handleDescriptionChange}
+      ></lightning-input>
+      <lightning-input
+        data-field="purchaseDate"
+        type="date"
+        label="Fecha de compra"
+        value={purchaseDate}
+        required
+        onchange={handlePurchaseDateChange}
+      ></lightning-input>
+      <lightning-input
+        data-field="totalAmount"
+        type="number"
+        formatter="currency"
+        step="0.01"
+        label="Monto total"
+        value={totalAmount}
+        required
+        min="0.01"
+        onchange={handleTotalAmountChange}
+      ></lightning-input>
+      <lightning-combobox
+        data-field="numberOfInstallments"
+        label="Cantidad de cuotas"
+        value={numberOfInstallments}
+        options={installmentsOptions}
+        required
+        onchange={handleInstallmentsChange}
+      ></lightning-combobox>
+      <lightning-combobox
+        data-field="category"
+        label="Categoría"
+        value={category}
+        options={categoryOptions}
+        placeholder="Sin categoría"
+        onchange={handleCategoryChange}
+      ></lightning-combobox>
+      <lightning-combobox
+        data-field="person"
+        label="Persona"
+        value={person}
+        options={personOptions}
+        required
+        onchange={handlePersonChange}
+      ></lightning-combobox>
+
+      <template lwc:if={installmentPreview}>
+        <div class="preview-box">
+          <p>
+            Cuota:
+            <lightning-formatted-number
+              value={installmentPreview}
+              format-style="currency"
+              currency-code="ARS"
+              currency-display-as="symbol"
+            ></lightning-formatted-number>
+          </p>
+          <p>Afecta: {affectedMonthsLabel}</p>
+        </div>
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancelar"
+      onclick={handleCancel}
+    ></lightning-button>
+    <lightning-button
+      label="Guardar"
+      variant="brand"
+      onclick={handleSave}
+      disabled={isSaving}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>
