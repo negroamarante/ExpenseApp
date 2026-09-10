@@ -23,7 +23,17 @@ sf org create scratch \
   --wait 15
 
 echo "==> Deploying source..."
-sf project deploy start --target-org "$SCRATCH_ALIAS" --source-dir force-app --wait 30
+# The Email Service hardcodes runAsUser to the real expenseApp admin, which
+# doesn't exist in a scratch org's own auto-generated user, so it's excluded
+# here. It still deploys normally to the real org.
+DEPLOY_DIRS=()
+for dir in force-app/main/default/*/; do
+  name=$(basename "$dir")
+  if [ "$name" != "emailservices" ]; then
+    DEPLOY_DIRS+=(--source-dir "$dir")
+  fi
+done
+sf project deploy start --target-org "$SCRATCH_ALIAS" "${DEPLOY_DIRS[@]}" --wait 30
 
 echo "==> Assigning permission set..."
 sf org assign permset --target-org "$SCRATCH_ALIAS" --name Presupuesto_Familiar_Acceso
