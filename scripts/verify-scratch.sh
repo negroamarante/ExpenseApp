@@ -9,27 +9,28 @@ DURATION_DAYS="${SCRATCH_DURATION_DAYS:-1}"
 
 cleanup() {
   echo "==> Deleting scratch org ${SCRATCH_ALIAS}..."
-  sf org delete scratch -o "$SCRATCH_ALIAS" --no-prompt || true
+  sf org delete scratch --target-org "$SCRATCH_ALIAS" --no-prompt || true
 }
 trap cleanup EXIT
 
 echo "==> Creating scratch org (dev hub: ${DEVHUB_ALIAS})..."
 sf org create scratch \
-  -v "$DEVHUB_ALIAS" \
-  -f config/project-scratch-def.json \
-  -a "$SCRATCH_ALIAS" \
-  -d "$DURATION_DAYS" \
-  --set-default
+  --target-dev-hub "$DEVHUB_ALIAS" \
+  --definition-file config/project-scratch-def.json \
+  --alias "$SCRATCH_ALIAS" \
+  --duration-days "$DURATION_DAYS" \
+  --set-default \
+  --wait 15
 
 echo "==> Deploying source..."
-sf project deploy start -o "$SCRATCH_ALIAS" -d force-app --wait 30
+sf project deploy start --target-org "$SCRATCH_ALIAS" --source-dir force-app --wait 30
 
 echo "==> Assigning permission set..."
-sf org assign permset -o "$SCRATCH_ALIAS" -n Presupuesto_Familiar_Acceso
+sf org assign permset --target-org "$SCRATCH_ALIAS" --name Presupuesto_Familiar_Acceso
 
 echo "==> Running Apex tests..."
 sf apex run test \
-  -o "$SCRATCH_ALIAS" \
+  --target-org "$SCRATCH_ALIAS" \
   --test-level RunLocalTests \
   --code-coverage \
   --result-format human \
