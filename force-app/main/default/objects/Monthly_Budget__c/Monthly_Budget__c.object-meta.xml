@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <label>Monthly Budget</label>
+    <pluralLabel>Monthly Budgets</pluralLabel>
+    <nameField>
+        <label>Monthly Budget Name</label>
+        <type>AutoNumber</type>
+        <displayFormat>BUD-{0000}</displayFormat>
+    </nameField>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

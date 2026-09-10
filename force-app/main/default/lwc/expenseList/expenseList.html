@@ -1,0 +1,36 @@
+<template>
+  <template lwc:if={hasExpenses}>
+    <ul class="expense-list">
+      <template for:each={displayItems} for:item="item">
+        <li key={item.id} class="expense-item">
+          <div class="expense-main" data-id={item.id} onclick={handleEdit}>
+            <p class="expense-description">{item.description}</p>
+            <p class="expense-meta">
+              {item.categoryLabel} · {item.person} · {item.installmentLabel}
+            </p>
+          </div>
+          <div class="expense-amount-block">
+            <p class="expense-amount">
+              <lightning-formatted-number
+                value={item.installmentAmount}
+                format-style="currency"
+                currency-code="ARS"
+                currency-display-as="symbol"
+              ></lightning-formatted-number>
+            </p>
+            <lightning-button-icon
+              icon-name="utility:delete"
+              variant="bare"
+              alternative-text="Eliminar"
+              data-id={item.id}
+              onclick={handleDelete}
+            ></lightning-button-icon>
+          </div>
+        </li>
+      </template>
+    </ul>
+  </template>
+  <template lwc:else>
+    <p class="empty-state">No hay consumos que afecten este mes.</p>
+  </template>
+</template>

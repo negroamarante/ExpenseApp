@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Installments_At_Least_One</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >VALUE(TEXT(Number_Of_Installments__c)) &lt; 1</errorConditionFormula>
+    <errorDisplayField>Number_Of_Installments__c</errorDisplayField>
+    <errorMessage>La cantidad de cuotas debe ser al menos 1.</errorMessage>
+</ValidationRule>
