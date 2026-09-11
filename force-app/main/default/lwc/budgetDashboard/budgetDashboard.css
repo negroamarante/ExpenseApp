@@ -68,6 +68,15 @@
   font-weight: 700;
   margin: 0.15rem 0 0 0;
 }
+.rollover-positive,
+.rollover-negative {
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem 0;
+  opacity: 0.9;
+}
+.rollover-negative {
+  font-weight: 700;
+}
 .available-block {
   text-align: center;
   padding-top: 0.5rem;

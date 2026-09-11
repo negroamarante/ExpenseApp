@@ -13,6 +13,7 @@ export default class BudgetDashboard extends LightningElement {
   summary;
   wiredResult;
   isLoading = true;
+  pendingRefresh = false;
 
   get isNotMobile() {
     return FORM_FACTOR !== "Small";
@@ -25,6 +26,24 @@ export default class BudgetDashboard extends LightningElement {
   @wire(getMonthSummary, { monthStart: "$monthStart" })
   wiredSummary(result) {
     this.wiredResult = result;
+    if (this.pendingRefresh && (result.data || result.error)) {
+      this.pendingRefresh = false;
+      refreshApex(this.wiredResult)
+        .then(() => {
+          if (this.wiredResult.data) {
+            this.summary = this.wiredResult.data;
+          } else if (this.wiredResult.error) {
+            this.notifyError(this.wiredResult.error);
+          }
+        })
+        .catch((error) => {
+          this.notifyError(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+      return;
+    }
     this.isLoading = false;
     if (result.data) {
       this.summary = result.data;
@@ -49,6 +68,32 @@ export default class BudgetDashboard extends LightningElement {
 
   get budgetAmount() {
     return this.summary ? this.summary.budgetAmount : 0;
+  }
+
+  get rolloverAmount() {
+    return this.summary ? this.summary.rolloverAmount : 0;
+  }
+
+  get hasRollover() {
+    return this.rolloverAmount !== 0;
+  }
+
+  get isRolloverPositive() {
+    return this.rolloverAmount > 0;
+  }
+
+  get rolloverDisplayAmount() {
+    return Math.abs(this.rolloverAmount);
+  }
+
+  get rolloverLabel() {
+    return this.isRolloverPositive
+      ? "Arrastre del mes anterior"
+      : "Se debe del mes anterior";
+  }
+
+  get rolloverClass() {
+    return this.isRolloverPositive ? "rollover-positive" : "rollover-negative";
   }
 
   get committedAmount() {
@@ -108,6 +153,8 @@ export default class BudgetDashboard extends LightningElement {
   shiftMonth(delta) {
     const [year, month] = this.monthStart.split("-").map(Number);
     const date = new Date(year, month - 1 + delta, 1);
+    this.isLoading = true;
+    this.pendingRefresh = true;
     this.monthStart = this.toDateString(date);
   }
 

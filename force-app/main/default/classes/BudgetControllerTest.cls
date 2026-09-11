@@ -104,12 +104,109 @@ private class BudgetControllerTest {
   static void testMonthWithoutBudget() {
     Test.startTest();
     BudgetController.MonthSummary summary = BudgetController.getMonthSummary(
-      Date.newInstance(2027, 1, 1)
+      Date.newInstance(2026, 8, 1)
     );
     Test.stopTest();
 
     System.assertEquals(false, summary.hasBudget);
     System.assertEquals(0, summary.budgetAmount);
+    System.assertEquals(0, summary.rolloverAmount);
+  }
+
+  @IsTest
+  static void testSurplusRollsIntoNextMonth() {
+    insert new Expense__c(
+      Description__c = 'Supermercado',
+      Purchase_Date__c = Date.newInstance(2026, 9, 5),
+      Total_Amount__c = 300000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego'
+    );
+
+    Test.startTest();
+    BudgetController.MonthSummary octSummary = BudgetController.getMonthSummary(
+      Date.newInstance(2026, 10, 1)
+    );
+    Test.stopTest();
+
+    System.assertEquals(1700000, octSummary.rolloverAmount);
+    System.assertEquals(0, octSummary.budgetAmount);
+    System.assertEquals(true, octSummary.hasBudget);
+    System.assertEquals(1700000, octSummary.availableAmount);
+  }
+
+  @IsTest
+  static void testDeficitCarriesForwardAsNegativeRollover() {
+    insert new Expense__c(
+      Description__c = 'Compra grande',
+      Purchase_Date__c = Date.newInstance(2026, 9, 5),
+      Total_Amount__c = 2500000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego'
+    );
+
+    Test.startTest();
+    BudgetController.MonthSummary octSummary = BudgetController.getMonthSummary(
+      Date.newInstance(2026, 10, 1)
+    );
+    Test.stopTest();
+
+    System.assertEquals(-500000, octSummary.rolloverAmount);
+    System.assertEquals(-500000, octSummary.availableAmount);
+    System.assertEquals(true, octSummary.hasBudget);
+  }
+
+  @IsTest
+  static void testRolloverChainsAcrossMultipleMonths() {
+    insert new Expense__c(
+      Description__c = 'Supermercado septiembre',
+      Purchase_Date__c = Date.newInstance(2026, 9, 5),
+      Total_Amount__c = 300000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego'
+    );
+    insert new Monthly_Budget__c(
+      Month_Start__c = Date.newInstance(2026, 10, 1),
+      Budget_Amount__c = 500000
+    );
+    insert new Expense__c(
+      Description__c = 'Compra octubre',
+      Purchase_Date__c = Date.newInstance(2026, 10, 10),
+      Total_Amount__c = 400000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Emi'
+    );
+
+    Test.startTest();
+    BudgetController.MonthSummary novSummary = BudgetController.getMonthSummary(
+      Date.newInstance(2026, 11, 1)
+    );
+    Test.stopTest();
+
+    // Sept: 2,000,000 - 300,000 = 1,700,000 available, rolls into Oct.
+    // Oct: (500,000 + 1,700,000) - 400,000 = 1,800,000 available, rolls into Nov.
+    System.assertEquals(1800000, novSummary.rolloverAmount);
+    System.assertEquals(1800000, novSummary.availableAmount);
+  }
+
+  @IsTest
+  static void testExpenseBeforeFirstBudgetRollsIntoLaterMonth() {
+    insert new Expense__c(
+      Description__c = 'Consumo agosto',
+      Purchase_Date__c = Date.newInstance(2026, 8, 20),
+      Total_Amount__c = 300000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego'
+    );
+
+    Test.startTest();
+    BudgetController.MonthSummary septSummary = BudgetController.getMonthSummary(
+      Date.newInstance(2026, 9, 1)
+    );
+    Test.stopTest();
+
+    System.assertEquals(-300000, septSummary.rolloverAmount);
+    System.assertEquals(1700000, septSummary.availableAmount);
   }
 
   @IsTest

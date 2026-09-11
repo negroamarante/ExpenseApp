@@ -42,6 +42,7 @@ const SAMPLE_SUMMARY = {
   monthStart: "2026-09-01",
   monthLabel: "septiembre 2026",
   budgetAmount: 1000,
+  rolloverAmount: 0,
   committedAmount: 400,
   availableAmount: 600,
   percentUsed: 40,
@@ -90,6 +91,51 @@ describe("c-budget-dashboard", () => {
     );
   });
 
+  it("does not show a rollover line when there is nothing to carry over", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit(SAMPLE_SUMMARY);
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector(".rollover-positive, .rollover-negative")
+    ).toBeNull();
+  });
+
+  it("shows a positive rollover carried in from the previous month", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit({ ...SAMPLE_SUMMARY, rolloverAmount: 250 });
+    await flushPromises();
+
+    const rolloverEl = element.shadowRoot.querySelector(".rollover-positive");
+    expect(rolloverEl).not.toBeNull();
+    expect(rolloverEl.textContent).toContain("Arrastre del mes anterior");
+    expect(rolloverEl.querySelector("lightning-formatted-number").value).toBe(
+      250
+    );
+  });
+
+  it("shows a negative rollover as a debt carried in from the previous month", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit({ ...SAMPLE_SUMMARY, rolloverAmount: -250 });
+    await flushPromises();
+
+    const rolloverEl = element.shadowRoot.querySelector(".rollover-negative");
+    expect(rolloverEl).not.toBeNull();
+    expect(rolloverEl.textContent).toContain("Se debe del mes anterior");
+    expect(rolloverEl.querySelector("lightning-formatted-number").value).toBe(
+      250
+    );
+  });
+
   it("moves the wire config to the next month when the arrow is clicked", async () => {
     const element = createElement("c-budget-dashboard", {
       is: BudgetDashboard
@@ -108,6 +154,36 @@ describe("c-budget-dashboard", () => {
     const nextMonthStart = getMonthSummary.getLastConfig().monthStart;
     expect(nextMonthStart).not.toBe(initialMonthStart);
     expect(nextMonthStart.endsWith("-10-01")).toBe(true);
+  });
+
+  it("refetches when changing months so rollover includes other months", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit(SAMPLE_SUMMARY);
+    await flushPromises();
+
+    element.shadowRoot
+      .querySelectorAll(".month-nav lightning-button-icon")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    getMonthSummary.emit({
+      ...SAMPLE_SUMMARY,
+      monthStart: "2026-10-01",
+      monthLabel: "octubre 2026",
+      rolloverAmount: 600
+    });
+    await flushPromises();
+
+    expect(refreshApex).toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector(".month-label").textContent).toBe(
+      "OCTUBRE 2026"
+    );
+    expect(
+      element.shadowRoot.querySelector(".rollover-positive")
+    ).not.toBeNull();
   });
 
   it("refreshes the summary after adding an expense successfully", async () => {

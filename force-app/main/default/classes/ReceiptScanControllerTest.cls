@@ -129,6 +129,31 @@ private class ReceiptScanControllerTest {
   }
 
   @IsTest
+  static void testScanReceiptDefaultsPersonWhenBlank() {
+    Test.setMock(
+      HttpCalloutMock.class,
+      new GeminiHttpMock(
+        200,
+        wrapGeminiText(
+          '{"description":"Restaurante","purchaseDate":"2026-09-11","totalAmount":63000,"category":"Entretenimiento","person":null}'
+        )
+      )
+    );
+
+    Test.startTest();
+    ReceiptScanController.ReceiptScanResult result = ReceiptScanController.scanReceipt(
+      'base64image',
+      'image/jpeg',
+      new List<String>{ 'Entretenimiento' },
+      new List<String>{ 'Diego', 'Emi' }
+    );
+    Test.stopTest();
+
+    System.assertEquals('Emi', result.person);
+    System.assertEquals(0, ErrorNotifier.notificationCount);
+  }
+
+  @IsTest
   static void testScanReceiptAllowsMissingCategory() {
     Test.setMock(
       HttpCalloutMock.class,

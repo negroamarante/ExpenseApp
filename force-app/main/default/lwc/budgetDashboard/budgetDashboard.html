@@ -50,7 +50,7 @@
                 </p>
               </div>
               <div class="tile">
-                <p class="tile-label">Comprometido</p>
+                <p class="tile-label">Usado</p>
                 <p class="tile-value">
                   <lightning-formatted-number
                     value={committedAmount}
@@ -61,6 +61,17 @@
                 </p>
               </div>
             </div>
+            <template lwc:if={hasRollover}>
+              <p class={rolloverClass}>
+                {rolloverLabel}:
+                <lightning-formatted-number
+                  value={rolloverDisplayAmount}
+                  format-style="currency"
+                  currency-code="ARS"
+                  currency-display-as="symbol"
+                ></lightning-formatted-number>
+              </p>
+            </template>
             <div class="available-block">
               <p class="available-icon">{availableIcon}</p>
               <p class="available-label">Disponible</p>

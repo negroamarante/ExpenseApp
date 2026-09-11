@@ -1,4 +1,6 @@
 public with sharing class ReceiptScanController {
+  private static final String DEFAULT_PERSON = 'Emi';
+
   public class ReceiptScanResult {
     @AuraEnabled
     public String description;
@@ -94,9 +96,6 @@ public with sharing class ReceiptScanController {
     if (result.totalAmount == null) {
       missing.add('monto');
     }
-    if (String.isBlank(result.person)) {
-      missing.add('persona');
-    }
     if (!missing.isEmpty()) {
       throw buildError(
         'No se pudo leer del ticket: ' +
@@ -126,6 +125,9 @@ public with sharing class ReceiptScanController {
       : null;
     result.category = (String) data.get('category');
     result.person = (String) data.get('person');
+    if (String.isBlank(result.person)) {
+      result.person = DEFAULT_PERSON;
+    }
     return result;
   }
 }
