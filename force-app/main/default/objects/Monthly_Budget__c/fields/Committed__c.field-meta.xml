@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Committed__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description
+  >Suma de las cuotas de este mes. Lo mantiene el trigger a partir de Expense_Installment__c.</description>
+    <label>Committed</label>
+    <precision>16</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

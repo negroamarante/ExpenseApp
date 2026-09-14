@@ -234,4 +234,28 @@ private class BudgetControllerTest {
 
     System.assertEquals(2000000, previous);
   }
+
+  @IsTest
+  static void testDeleteExpenseClearsCommitted() {
+    Expense__c expense = new Expense__c(
+      Description__c = 'Supermercado',
+      Purchase_Date__c = Date.newInstance(2026, 9, 5),
+      Total_Amount__c = 300000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego'
+    );
+    insert expense;
+
+    Test.startTest();
+    delete expense;
+    Test.stopTest();
+
+    Monthly_Budget__c sept = [
+      SELECT Committed__c, Available__c
+      FROM Monthly_Budget__c
+      WHERE Month_Start__c = :Date.newInstance(2026, 9, 1)
+    ];
+    System.assertEquals(0, sept.Committed__c);
+    System.assertEquals(2000000, sept.Available__c);
+  }
 }

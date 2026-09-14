@@ -1,20 +1,30 @@
 <template>
   <div class="dashboard">
     <div class="dashboard-header">
-      <div class="month-nav">
-        <lightning-button-icon
-          icon-name="utility:chevronleft"
-          variant="bare"
-          alternative-text="Mes anterior"
-          onclick={handlePrevMonth}
-        ></lightning-button-icon>
-        <span class="month-label">{monthLabel}</span>
-        <lightning-button-icon
-          icon-name="utility:chevronright"
-          variant="bare"
-          alternative-text="Mes siguiente"
-          onclick={handleNextMonth}
-        ></lightning-button-icon>
+      <div class="month-nav-block">
+        <div class="month-nav">
+          <lightning-button-icon
+            icon-name="utility:chevronleft"
+            variant="bare"
+            alternative-text="Mes anterior"
+            onclick={handlePrevMonth}
+          ></lightning-button-icon>
+          <span class="month-label">{monthLabel}</span>
+          <lightning-button-icon
+            icon-name="utility:chevronright"
+            variant="bare"
+            alternative-text="Mes siguiente"
+            onclick={handleNextMonth}
+          ></lightning-button-icon>
+        </div>
+        <template lwc:if={showCurrentMonthButton}>
+          <lightning-button
+            class="current-month-button"
+            variant="base"
+            label="Mes actual"
+            onclick={handleCurrentMonth}
+          ></lightning-button>
+        </template>
       </div>
 
       <template lwc:if={isLoading}>

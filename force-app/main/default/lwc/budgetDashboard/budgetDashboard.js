@@ -150,12 +150,31 @@ export default class BudgetDashboard extends LightningElement {
     this.shiftMonth(1);
   }
 
+  handleCurrentMonth() {
+    this.goToMonth(this.currentMonthStart);
+  }
+
+  get currentMonthStart() {
+    return this.toDateString(this.startOfMonth(new Date()));
+  }
+
+  get showCurrentMonthButton() {
+    return this.monthStart !== this.currentMonthStart;
+  }
+
   shiftMonth(delta) {
     const [year, month] = this.monthStart.split("-").map(Number);
     const date = new Date(year, month - 1 + delta, 1);
+    this.goToMonth(this.toDateString(date));
+  }
+
+  goToMonth(monthStart) {
+    if (monthStart === this.monthStart) {
+      return;
+    }
     this.isLoading = true;
     this.pendingRefresh = true;
-    this.monthStart = this.toDateString(date);
+    this.monthStart = monthStart;
   }
 
   async handleAddExpense() {

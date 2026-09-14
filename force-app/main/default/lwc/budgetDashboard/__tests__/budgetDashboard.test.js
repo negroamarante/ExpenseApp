@@ -156,6 +156,46 @@ describe("c-budget-dashboard", () => {
     expect(nextMonthStart.endsWith("-10-01")).toBe(true);
   });
 
+  it("does not show a current month button when already on this month", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit(SAMPLE_SUMMARY);
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector(".current-month-button")
+    ).toBeNull();
+  });
+
+  it("jumps back to the current month from the header button", async () => {
+    const element = createElement("c-budget-dashboard", {
+      is: BudgetDashboard
+    });
+    document.body.appendChild(element);
+    getMonthSummary.emit(SAMPLE_SUMMARY);
+    await flushPromises();
+
+    const currentMonthStart = getMonthSummary.getLastConfig().monthStart;
+
+    element.shadowRoot
+      .querySelectorAll(".month-nav lightning-button-icon")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector(".current-month-button")
+    ).not.toBeNull();
+
+    element.shadowRoot
+      .querySelector(".current-month-button")
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(getMonthSummary.getLastConfig().monthStart).toBe(currentMonthStart);
+  });
+
   it("refetches when changing months so rollover includes other months", async () => {
     const element = createElement("c-budget-dashboard", {
       is: BudgetDashboard

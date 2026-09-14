@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Monthly_Budget__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >Presupuesto del mes de compra. Lo completa el trigger; no se edita a mano.</description>
+    <label>Monthly Budget</label>
+    <referenceTo>Monthly_Budget__c</referenceTo>
+    <relationshipLabel>Purchases</relationshipLabel>
+    <relationshipName>Purchases</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

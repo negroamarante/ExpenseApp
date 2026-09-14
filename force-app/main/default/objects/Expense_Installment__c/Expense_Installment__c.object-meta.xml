@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >Cuota de un consumo asignada a un mes. Una compra en 6 cuotas genera 6 registros.</description>
+    <enableReports>true</enableReports>
+    <label>Expense Installment</label>
+    <nameField>
+        <displayFormat>CUOTA-{0000}</displayFormat>
+        <label>Installment Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Expense Installments</pluralLabel>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

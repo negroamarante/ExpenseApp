@@ -15,7 +15,7 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>Monthly_Budget__c</tab>
+        <tab>Expense_Installment__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <objectPermissions>
@@ -29,6 +29,15 @@
     </objectPermissions>
     <objectPermissions>
         <object>Expense__c</object>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <object>Expense_Installment__c</object>
         <allowCreate>true</allowCreate>
         <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
@@ -52,6 +61,21 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <field>Monthly_Budget__c.Committed__c</field>
+        <editable>false</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Monthly_Budget__c.Rollover_In__c</field>
+        <editable>false</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Monthly_Budget__c.Available__c</field>
+        <editable>false</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <field>Expense__c.Installment_Amount__c</field>
         <editable>false</editable>
         <readable>true</readable>
@@ -64,6 +88,11 @@
     <fieldPermissions>
         <field>Expense__c.Category__c</field>
         <editable>true</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Expense__c.Monthly_Budget__c</field>
+        <editable>false</editable>
         <readable>true</readable>
     </fieldPermissions>
 </PermissionSet>
