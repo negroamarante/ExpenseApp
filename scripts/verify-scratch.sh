@@ -24,8 +24,8 @@ sf org create scratch \
 
 echo "==> Deploying source..."
 # The Email Service hardcodes runAsUser to the real expenseApp admin, which
-# doesn't exist in a scratch org's own auto-generated user, so it's excluded
-# here. It still deploys normally to the real org.
+# doesn't exist in a scratch org, so it's excluded here. For a usable inbound
+# address on a scratch org, run scripts/setup-scratch-email.sh after deploy.
 DEPLOY_DIRS=()
 for dir in force-app/main/default/*/; do
   name=$(basename "$dir")
