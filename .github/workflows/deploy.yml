@@ -1,0 +1,45 @@
+name: Deploy to Developer Org
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-developer-org
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate Developer Org
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > /tmp/org_auth.txt
+          sf org login sfdx-url -f /tmp/org_auth.txt -a developer-org
+          rm -f /tmp/org_auth.txt
+
+      - name: Deploy source
+        run: |
+          sf project deploy start \
+            --target-org developer-org \
+            --source-dir force-app \
+            --test-level RunLocalTests \
+            --wait 30
+
+      - name: Migrate legacy Counts_Toward_Budget__c data
+        run: |
+          sf apex run \
+            --target-org developer-org \
+            --file scripts/apex/migrate-counts-toward-budget.apex

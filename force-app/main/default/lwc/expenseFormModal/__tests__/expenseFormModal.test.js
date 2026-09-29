@@ -313,4 +313,152 @@ describe("c-expense-form-modal", () => {
 
     restoreImagePipeline();
   });
+
+  it("creates a spending expense with payment method and flags", async () => {
+    createRecord.mockResolvedValue({ id: "a01000000000005" });
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    fillField(element, "description", "Verdulería");
+    fillField(element, "purchaseDate", "2026-09-10");
+    fillField(element, "totalAmount", "12000");
+    fillField(element, "numberOfInstallments", "1");
+    fillField(element, "paymentMethod", "Efectivo");
+    fillField(element, "category", "Supermercado");
+    fillField(element, "person", "Diego");
+
+    const closeHandler = jest.fn();
+    element.addEventListener("__close", closeHandler);
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(createRecord).toHaveBeenCalledTimes(1);
+    expect(createRecord.mock.calls[0][0].fields).toMatchObject({
+      Description__c: "Verdulería",
+      Number_Of_Installments__c: "1",
+      Payment_Method__c: "Efectivo",
+      Counts_Toward_Spending__c: true,
+      Counts_Toward_Budget__c: false
+    });
+    expect(closeHandler.mock.calls[0][0].detail).toBe("success");
+  });
+
+  it("saves spending expenses with installments when selected", async () => {
+    createRecord.mockResolvedValue({ id: "a01000000000006" });
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    fillField(element, "description", "TV");
+    fillField(element, "purchaseDate", "2026-09-10");
+    fillField(element, "totalAmount", "300000");
+    fillField(element, "numberOfInstallments", "3");
+    fillField(element, "paymentMethod", "Otra tarjeta");
+    fillField(element, "category", "Hogar");
+    fillField(element, "person", "Diego");
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(createRecord.mock.calls[0][0].fields).toMatchObject({
+      Number_Of_Installments__c: "3",
+      Counts_Toward_Spending__c: true,
+      Counts_Toward_Budget__c: false
+    });
+  });
+
+  it("creates a spending expense that also counts toward the budget when checked", async () => {
+    createRecord.mockResolvedValue({ id: "a01000000000007" });
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    fillField(element, "description", "Farmacia");
+    fillField(element, "purchaseDate", "2026-09-10");
+    fillField(element, "totalAmount", "5000");
+    fillField(element, "numberOfInstallments", "1");
+    fillField(element, "paymentMethod", "Efectivo");
+    fillField(element, "category", "Salud");
+    fillField(element, "person", "Diego");
+
+    const dualCheckbox = element.shadowRoot.querySelector(
+      '[data-checkbox="alsoCountsTowardBudget"]'
+    );
+    dualCheckbox.checked = true;
+    dualCheckbox.dispatchEvent(new CustomEvent("change"));
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(createRecord.mock.calls[0][0].fields).toMatchObject({
+      Counts_Toward_Spending__c: true,
+      Counts_Toward_Budget__c: true
+    });
+  });
+
+  it("loads an existing dual-tracked spending expense with the checkbox checked", async () => {
+    updateRecord.mockResolvedValue({});
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    element.expenseId = "a01000000000008";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    getRecord.emit({
+      fields: {
+        Description__c: { value: "Nafta" },
+        Purchase_Date__c: { value: "2026-09-12" },
+        Total_Amount__c: { value: 8000 },
+        Number_Of_Installments__c: { value: "1" },
+        Category__c: { value: "Auto" },
+        Person__c: { value: "Diego" },
+        Payment_Method__c: { value: "Efectivo" },
+        Counts_Toward_Budget__c: { value: true }
+      }
+    });
+    await flushPromises();
+
+    const dualCheckbox = element.shadowRoot.querySelector(
+      '[data-checkbox="alsoCountsTowardBudget"]'
+    );
+    expect(dualCheckbox.checked).toBe(true);
+
+    element.shadowRoot.querySelectorAll("[data-field]").forEach((el) => {
+      el.checkValidity = jest.fn().mockReturnValue(true);
+      el.reportValidity = jest.fn();
+    });
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(updateRecord.mock.calls[0][0].fields).toMatchObject({
+      Id: "a01000000000008",
+      Counts_Toward_Budget__c: true
+    });
+  });
 });

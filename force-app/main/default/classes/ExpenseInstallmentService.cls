@@ -91,7 +91,8 @@ public with sharing class ExpenseInstallmentService {
         Total_Amount__c,
         Number_Of_Installments__c,
         Installment_Amount__c,
-        Monthly_Budget__c
+        Monthly_Budget__c,
+        Counts_Toward_Budget__c
       FROM Expense__c
     ];
     if (expenses.isEmpty()) {
@@ -199,7 +200,9 @@ public with sharing class ExpenseInstallmentService {
     for (AggregateResult row : [
       SELECT Monthly_Budget__c budgetId, SUM(Amount__c) total
       FROM Expense_Installment__c
-      WHERE Monthly_Budget__c IN :budgetIds
+      WHERE
+        Monthly_Budget__c IN :budgetIds
+        AND Expense__r.Counts_Toward_Budget__c = TRUE
       GROUP BY Monthly_Budget__c
     ]) {
       committedByBudget.put(
@@ -262,7 +265,8 @@ public with sharing class ExpenseInstallmentService {
   ) {
     return current.Purchase_Date__c != previous.Purchase_Date__c ||
       current.Total_Amount__c != previous.Total_Amount__c ||
-      current.Number_Of_Installments__c != previous.Number_Of_Installments__c;
+      current.Number_Of_Installments__c != previous.Number_Of_Installments__c ||
+      current.Counts_Toward_Budget__c != previous.Counts_Toward_Budget__c;
   }
 
   private static Date earliestMonth(

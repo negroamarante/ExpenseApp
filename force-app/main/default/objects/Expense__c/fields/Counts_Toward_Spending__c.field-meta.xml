@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Counts_Toward_Spending__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description
+  >If true, this expense appears in the monthly spending control view (cash / other cards / dual tracking).</description>
+    <externalId>false</externalId>
+    <label>Counts Toward Spending</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -258,4 +258,37 @@ private class BudgetControllerTest {
     System.assertEquals(0, sept.Committed__c);
     System.assertEquals(2000000, sept.Available__c);
   }
+
+  @IsTest
+  static void testSpendingOnlyExpensesDoNotAppearInBudgetList() {
+    insert new List<Expense__c>{
+      new Expense__c(
+        Description__c = 'Cupo',
+        Purchase_Date__c = Date.newInstance(2026, 9, 5),
+        Total_Amount__c = 100000,
+        Number_Of_Installments__c = '1',
+        Person__c = 'Diego',
+        Counts_Toward_Budget__c = true,
+        Counts_Toward_Spending__c = false
+      ),
+      new Expense__c(
+        Description__c = 'Efectivo',
+        Purchase_Date__c = Date.newInstance(2026, 9, 6),
+        Total_Amount__c = 50000,
+        Number_Of_Installments__c = '1',
+        Person__c = 'Emi',
+        Counts_Toward_Budget__c = false,
+        Counts_Toward_Spending__c = true,
+        Payment_Method__c = 'Efectivo'
+      )
+    };
+
+    BudgetController.MonthSummary summary = BudgetController.getMonthSummary(
+      Date.newInstance(2026, 9, 1)
+    );
+
+    System.assertEquals(1, summary.expenses.size());
+    System.assertEquals('Cupo', summary.expenses[0].description);
+    System.assertEquals(100000, summary.committedAmount);
+  }
 }

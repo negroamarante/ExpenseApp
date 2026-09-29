@@ -9,6 +9,7 @@
     <label>Presupuesto Familiar</label>
     <navType>Standard</navType>
     <tabs>Budget_Dashboard</tabs>
+    <tabs>Spending_Dashboard</tabs>
     <tabs>Expense__c</tabs>
     <tabs>Monthly_Budget__c</tabs>
     <uiType>Lightning</uiType>
