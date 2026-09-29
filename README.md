@@ -69,3 +69,8 @@ graph TD
 ## Modelo de datos
 
 La compra (`Expense__c`), las cuotas (`Expense_Installment__c`) y el presupuesto del mes (`Monthly_Budget__c`). Diagramas de objetos y un ejemplo de cuotas: **[docs/object-model.md](docs/object-model.md)**.
+
+## CI / Deploy
+
+- **`.github/workflows/ci.yml`** — En cada PR a `main`: crea una scratch org, deploya, corre tests Apex y Jest, y la borra.
+- **`.github/workflows/deploy.yml`** — En cada push a `main` (merge de PR), o a mano desde Actions: deploya todo `force-app` a la Developer Org con `RunLocalTests`. Usa el secret `SFDX_AUTH_URL` (la misma org que funciona de Dev Hub).
