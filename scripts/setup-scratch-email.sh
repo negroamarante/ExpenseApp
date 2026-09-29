@@ -44,18 +44,28 @@ result = payload.get("result") or {}
 if payload.get("status") not in (0, None):
     sys.stderr.write("Could not read the target org.\n")
     sys.exit(1)
-if result.get("isScratch") is not True:
-    sys.stderr.write(
-        "This script is only for scratch orgs. The Email Service in force-app "
-        "already targets the production user.\n"
-    )
-    sys.exit(1)
 username = result.get("username")
 if not username:
     sys.stderr.write("Org display did not include a username.\n")
     sys.exit(1)
 print(username)
 ' <<<"$ORG_JSON")"
+
+# `sf org display --json` has no `result.isScratch` field, so verify the
+# resolved username is actually a scratch org via `sf org list`.
+ORG_LIST_JSON="$(sf org list --json)"
+python3 -c '
+import json, sys
+payload = json.load(sys.stdin)
+username = sys.argv[1]
+scratch_orgs = (payload.get("result") or {}).get("scratchOrgs") or []
+if not any(org.get("username") == username for org in scratch_orgs):
+    sys.stderr.write(
+        "This script is only for scratch orgs. The Email Service in force-app "
+        "already targets the production user.\n"
+    )
+    sys.exit(1)
+' "$USERNAME" <<<"$ORG_LIST_JSON"
 
 echo "==> Scratch user: ${USERNAME}"
 echo "==> Generating Email Service metadata..."

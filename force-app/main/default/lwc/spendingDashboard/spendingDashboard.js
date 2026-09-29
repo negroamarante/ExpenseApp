@@ -11,10 +11,29 @@ export default class SpendingDashboard extends LightningElement {
   summary;
   wiredResult;
   isLoading = true;
+  pendingRefresh = false;
 
   @wire(getMonthSpending, { monthStart: "$monthStart" })
   wiredSpending(result) {
     this.wiredResult = result;
+    if (this.pendingRefresh && (result.data || result.error)) {
+      this.pendingRefresh = false;
+      refreshApex(this.wiredResult)
+        .then(() => {
+          if (this.wiredResult.data) {
+            this.summary = this.wiredResult.data;
+          } else if (this.wiredResult.error) {
+            this.notifyError(this.wiredResult.error);
+          }
+        })
+        .catch((error) => {
+          this.notifyError(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+      return;
+    }
     this.isLoading = false;
     if (result.data) {
       this.summary = result.data;
@@ -88,7 +107,11 @@ export default class SpendingDashboard extends LightningElement {
   }
 
   goToMonth(monthStart) {
+    if (monthStart === this.monthStart) {
+      return;
+    }
     this.isLoading = true;
+    this.pendingRefresh = true;
     this.monthStart = monthStart;
   }
 
@@ -120,7 +143,8 @@ export default class SpendingDashboard extends LightningElement {
     event.stopPropagation();
     const expenseId = event.currentTarget.dataset.id;
     const confirmed = await LightningConfirm.open({
-      message: "¿Borrar este gasto del control?",
+      message:
+        "¿Borrar este gasto? Se elimina el registro por completo y también desaparece del límite cupo si estaba marcado para descontar ahí.",
       label: "Confirmar",
       theme: "warning"
     });

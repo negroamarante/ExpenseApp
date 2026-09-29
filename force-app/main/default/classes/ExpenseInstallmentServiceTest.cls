@@ -126,4 +126,57 @@ private class ExpenseInstallmentServiceTest {
       ]
     );
   }
+
+  @IsTest
+  static void testTogglingCountsTowardBudgetRecalculatesCommitted() {
+    Expense__c expense = new Expense__c(
+      Description__c = 'Compra dual',
+      Purchase_Date__c = Date.newInstance(2026, 9, 5),
+      Total_Amount__c = 300000,
+      Number_Of_Installments__c = '1',
+      Person__c = 'Diego',
+      Counts_Toward_Budget__c = true
+    );
+    insert expense;
+
+    Monthly_Budget__c sept = [
+      SELECT Committed__c
+      FROM Monthly_Budget__c
+      WHERE Month_Start__c = :Date.newInstance(2026, 9, 1)
+    ];
+    System.assertEquals(300000, sept.Committed__c);
+
+    Test.startTest();
+    expense.Counts_Toward_Budget__c = false;
+    update expense;
+    Test.stopTest();
+
+    sept = [
+      SELECT Committed__c
+      FROM Monthly_Budget__c
+      WHERE Month_Start__c = :Date.newInstance(2026, 9, 1)
+    ];
+    System.assertEquals(0, sept.Committed__c);
+
+    List<Expense_Installment__c> lines = [
+      SELECT Id
+      FROM Expense_Installment__c
+      WHERE Expense__c = :expense.Id
+    ];
+    System.assertEquals(
+      1,
+      lines.size(),
+      'Installment should still exist so the expense can be counted for spending'
+    );
+
+    expense.Counts_Toward_Budget__c = true;
+    update expense;
+
+    sept = [
+      SELECT Committed__c
+      FROM Monthly_Budget__c
+      WHERE Month_Start__c = :Date.newInstance(2026, 9, 1)
+    ];
+    System.assertEquals(300000, sept.Committed__c);
+  }
 }

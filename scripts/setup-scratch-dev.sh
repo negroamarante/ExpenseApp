@@ -38,6 +38,30 @@ if [[ -n "$TARGET_ORG" ]]; then
   SF_TARGET=(--target-org "$TARGET_ORG")
 fi
 
+echo "==> Verifying target is a scratch org..."
+ORG_JSON="$(sf org display "${SF_TARGET[@]}" --json)"
+ORG_LIST_JSON="$(sf org list --json)"
+python3 -c '
+import json, sys
+org_payload = json.loads(sys.argv[1])
+list_payload = json.loads(sys.argv[2])
+if org_payload.get("status") not in (0, None):
+    sys.stderr.write("Could not read the target org.\n")
+    sys.exit(1)
+username = (org_payload.get("result") or {}).get("username")
+if not username:
+    sys.stderr.write("Org display did not include a username.\n")
+    sys.exit(1)
+scratch_orgs = (list_payload.get("result") or {}).get("scratchOrgs") or []
+if not any(org.get("username") == username for org in scratch_orgs):
+    sys.stderr.write(
+        "This script deploys source and can seed dummy financial data; it "
+        "only runs against scratch orgs. Resolved target (" + username +
+        ") is not a scratch org.\n"
+    )
+    sys.exit(1)
+' "$ORG_JSON" "$ORG_LIST_JSON"
+
 echo "==> Deploying source (excluding emailservices)..."
 DEPLOY_DIRS=()
 for dir in force-app/main/default/*/; do

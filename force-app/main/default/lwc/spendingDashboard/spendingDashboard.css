@@ -67,9 +67,22 @@
 .expense-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   padding: 0.85rem 0;
   border-bottom: 1px solid #e5e5e5;
+}
+.expense-main {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
 }
 .expense-description {

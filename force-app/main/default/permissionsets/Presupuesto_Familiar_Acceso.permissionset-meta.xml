@@ -49,6 +49,10 @@
         <modifyAllRecords>false</modifyAllRecords>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <classAccesses>
+        <apexClass>SpendingController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <field>Monthly_Budget__c.Month_Label__c</field>
         <editable>false</editable>

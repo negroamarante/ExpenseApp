@@ -37,3 +37,9 @@ jobs:
             --source-dir force-app \
             --test-level RunLocalTests \
             --wait 30
+
+      - name: Migrate legacy Counts_Toward_Budget__c data
+        run: |
+          sf apex run \
+            --target-org developer-org \
+            --file scripts/apex/migrate-counts-toward-budget.apex

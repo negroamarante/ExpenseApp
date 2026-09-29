@@ -3,7 +3,7 @@
     <fullName>Counts_Toward_Budget__c</fullName>
     <defaultValue>true</defaultValue>
     <description
-  >If true, this expense creates installments and impacts Monthly_Budget committed/rollover.</description>
+  >If true, this expense's installments also count toward Monthly_Budget committed/rollover (the credit-limit view). Installments are always created regardless of this flag, so the expense can still be counted for spending in its respective months.</description>
     <externalId>false</externalId>
     <label>Counts Toward Budget</label>
     <type>Checkbox</type>

@@ -55,13 +55,13 @@
       <template lwc:if={hasExpenses}>
         <ul class="expense-list">
           <template for:each={displayItems} for:item="item">
-            <li
-              key={item.id}
-              class="expense-row"
-              data-id={item.id}
-              onclick={handleEditExpense}
-            >
-              <div class="expense-main">
+            <li key={item.id} class="expense-row" data-id={item.id}>
+              <button
+                type="button"
+                class="expense-main"
+                data-id={item.id}
+                onclick={handleEditExpense}
+              >
                 <p class="expense-description">{item.description}</p>
                 <p class="expense-meta">
                   {item.person} · {item.methodLabel} · {item.installmentLabel}
@@ -69,7 +69,7 @@
                     · {item.dualLabel}
                   </template>
                 </p>
-              </div>
+              </button>
               <div class="expense-side">
                 <lightning-formatted-number
                   value={item.amountToShow}
