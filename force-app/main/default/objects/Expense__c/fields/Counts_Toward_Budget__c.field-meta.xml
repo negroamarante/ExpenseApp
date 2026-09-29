@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Counts_Toward_Budget__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description
+  >If true, this expense creates installments and impacts Monthly_Budget committed/rollover.</description>
+    <externalId>false</externalId>
+    <label>Counts Toward Budget</label>
+    <type>Checkbox</type>
+</CustomField>

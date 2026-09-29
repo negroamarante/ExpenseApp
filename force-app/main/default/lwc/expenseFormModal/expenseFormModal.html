@@ -60,14 +60,32 @@
         min="0.01"
         onchange={handleTotalAmountChange}
       ></lightning-input>
-      <lightning-combobox
-        data-field="numberOfInstallments"
-        label="Cantidad de cuotas"
-        value={numberOfInstallments}
-        options={installmentsOptions}
-        required
-        onchange={handleInstallmentsChange}
-      ></lightning-combobox>
+      <template lwc:if={showInstallments}>
+        <lightning-combobox
+          data-field="numberOfInstallments"
+          label="Cantidad de cuotas"
+          value={numberOfInstallments}
+          options={installmentsOptions}
+          required
+          onchange={handleInstallmentsChange}
+        ></lightning-combobox>
+      </template>
+      <template lwc:if={isSpendingMode}>
+        <lightning-combobox
+          data-field="paymentMethod"
+          label="Medio de pago"
+          value={paymentMethod}
+          options={paymentMethodOptions}
+          required
+          onchange={handlePaymentMethodChange}
+        ></lightning-combobox>
+        <lightning-input
+          type="checkbox"
+          label="También descontar del límite cupo"
+          checked={alsoCountsTowardBudget}
+          onchange={handleAlsoBudgetChange}
+        ></lightning-input>
+      </template>
       <lightning-combobox
         data-field="category"
         label="Categoría"
@@ -85,7 +103,7 @@
         onchange={handlePersonChange}
       ></lightning-combobox>
 
-      <template lwc:if={installmentPreview}>
+      <template lwc:if={showInstallmentPreview}>
         <div class="preview-box">
           <p>
             Cuota:

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payment_Method__c</fullName>
+    <description
+  >How the expense was paid. Used for labeling; budget vs spending impact is controlled by the Counts Toward flags.</description>
+    <label>Payment Method</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Tarjeta presupuesto</fullName>
+                <default>true</default>
+                <label>Tarjeta presupuesto</label>
+            </value>
+            <value>
+                <fullName>Otra tarjeta</fullName>
+                <default>false</default>
+                <label>Otra tarjeta</label>
+            </value>
+            <value>
+                <fullName>Efectivo</fullName>
+                <default>false</default>
+                <label>Efectivo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

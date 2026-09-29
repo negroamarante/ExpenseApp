@@ -1,0 +1,106 @@
+<template>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <div class="month-nav-block">
+        <div class="month-nav">
+          <lightning-button-icon
+            icon-name="utility:chevronleft"
+            variant="bare"
+            alternative-text="Mes anterior"
+            onclick={handlePrevMonth}
+          ></lightning-button-icon>
+          <span class="month-label">{monthLabel}</span>
+          <lightning-button-icon
+            icon-name="utility:chevronright"
+            variant="bare"
+            alternative-text="Mes siguiente"
+            onclick={handleNextMonth}
+          ></lightning-button-icon>
+        </div>
+        <template lwc:if={showCurrentMonthButton}>
+          <lightning-button
+            class="current-month-button"
+            variant="base"
+            label="Mes actual"
+            onclick={handleCurrentMonth}
+          ></lightning-button>
+        </template>
+      </div>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Cargando"
+          size="medium"
+        ></lightning-spinner>
+      </template>
+      <template lwc:else>
+        <div class="summary-tile">
+          <p class="tile-label">Gastado en el mes</p>
+          <p class="tile-value">
+            <lightning-formatted-number
+              value={totalSpent}
+              format-style="currency"
+              currency-code="ARS"
+              currency-display-as="symbol"
+            ></lightning-formatted-number>
+          </p>
+          <p class="tile-hint">
+            Efectivo, otras tarjetas, o gastos que también cuentan para control.
+          </p>
+        </div>
+      </template>
+    </div>
+
+    <div class="dashboard-scroll">
+      <template lwc:if={hasExpenses}>
+        <ul class="expense-list">
+          <template for:each={displayItems} for:item="item">
+            <li
+              key={item.id}
+              class="expense-row"
+              data-id={item.id}
+              onclick={handleEditExpense}
+            >
+              <div class="expense-main">
+                <p class="expense-description">{item.description}</p>
+                <p class="expense-meta">
+                  {item.person} · {item.methodLabel} · {item.installmentLabel}
+                  <template lwc:if={item.dualLabel}>
+                    · {item.dualLabel}
+                  </template>
+                </p>
+              </div>
+              <div class="expense-side">
+                <lightning-formatted-number
+                  value={item.amountToShow}
+                  format-style="currency"
+                  currency-code="ARS"
+                  currency-display-as="symbol"
+                ></lightning-formatted-number>
+                <lightning-button-icon
+                  icon-name="utility:delete"
+                  variant="bare"
+                  alternative-text="Borrar"
+                  data-id={item.id}
+                  onclick={handleDelete}
+                ></lightning-button-icon>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:else>
+        <template lwc:if={isLoading}>
+          <!-- spinner already in header -->
+        </template>
+        <template lwc:else>
+          <p class="empty">No hay gastos de control en este mes.</p>
+        </template>
+      </template>
+    </div>
+
+    <button class="fab" onclick={handleAddExpense} title="Nuevo gasto">
+      +
+    </button>
+  </div>
+</template>

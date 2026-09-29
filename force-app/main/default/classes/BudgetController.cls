@@ -87,7 +87,9 @@ public with sharing class BudgetController {
         Expense__r.Category__c,
         Expense__r.Person__c
       FROM Expense_Installment__c
-      WHERE Month_Start__c = :normalizedStart
+      WHERE
+        Month_Start__c = :normalizedStart
+        AND Expense__r.Counts_Toward_Budget__c = TRUE
       WITH USER_MODE
       ORDER BY Expense__r.Purchase_Date__c DESC
     ]) {

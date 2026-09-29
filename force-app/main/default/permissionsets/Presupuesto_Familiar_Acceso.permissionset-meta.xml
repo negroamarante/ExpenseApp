@@ -11,6 +11,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
+        <tab>Spending_Dashboard</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>Expense__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
@@ -87,6 +91,21 @@
     </fieldPermissions>
     <fieldPermissions>
         <field>Expense__c.Category__c</field>
+        <editable>true</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Expense__c.Counts_Toward_Budget__c</field>
+        <editable>true</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Expense__c.Counts_Toward_Spending__c</field>
+        <editable>true</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <field>Expense__c.Payment_Method__c</field>
         <editable>true</editable>
         <readable>true</readable>
     </fieldPermissions>

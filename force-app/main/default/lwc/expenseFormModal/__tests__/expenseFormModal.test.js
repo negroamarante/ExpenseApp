@@ -313,4 +313,71 @@ describe("c-expense-form-modal", () => {
 
     restoreImagePipeline();
   });
+
+  it("creates a spending expense with payment method and flags", async () => {
+    createRecord.mockResolvedValue({ id: "a01000000000005" });
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    fillField(element, "description", "Verdulería");
+    fillField(element, "purchaseDate", "2026-09-10");
+    fillField(element, "totalAmount", "12000");
+    fillField(element, "numberOfInstallments", "1");
+    fillField(element, "paymentMethod", "Efectivo");
+    fillField(element, "category", "Supermercado");
+    fillField(element, "person", "Diego");
+
+    const closeHandler = jest.fn();
+    element.addEventListener("__close", closeHandler);
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(createRecord).toHaveBeenCalledTimes(1);
+    expect(createRecord.mock.calls[0][0].fields).toMatchObject({
+      Description__c: "Verdulería",
+      Number_Of_Installments__c: "1",
+      Payment_Method__c: "Efectivo",
+      Counts_Toward_Spending__c: true,
+      Counts_Toward_Budget__c: false
+    });
+    expect(closeHandler.mock.calls[0][0].detail).toBe("success");
+  });
+
+  it("saves spending expenses with installments when selected", async () => {
+    createRecord.mockResolvedValue({ id: "a01000000000006" });
+
+    const element = createElement("c-expense-form-modal", {
+      is: ExpenseFormModal
+    });
+    element.mode = "spending";
+    document.body.appendChild(element);
+    await flushPromises();
+
+    fillField(element, "description", "TV");
+    fillField(element, "purchaseDate", "2026-09-10");
+    fillField(element, "totalAmount", "300000");
+    fillField(element, "numberOfInstallments", "3");
+    fillField(element, "paymentMethod", "Otra tarjeta");
+    fillField(element, "category", "Hogar");
+    fillField(element, "person", "Diego");
+
+    element.shadowRoot
+      .querySelectorAll("lightning-button")[1]
+      .dispatchEvent(new CustomEvent("click"));
+    await flushPromises();
+
+    expect(createRecord.mock.calls[0][0].fields).toMatchObject({
+      Number_Of_Installments__c: "3",
+      Counts_Toward_Spending__c: true,
+      Counts_Toward_Budget__c: false
+    });
+  });
 });

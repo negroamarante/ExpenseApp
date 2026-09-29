@@ -13,6 +13,9 @@ import TOTAL_AMOUNT_FIELD from "@salesforce/schema/Expense__c.Total_Amount__c";
 import CATEGORY_FIELD from "@salesforce/schema/Expense__c.Category__c";
 import PERSON_FIELD from "@salesforce/schema/Expense__c.Person__c";
 import INSTALLMENTS_FIELD from "@salesforce/schema/Expense__c.Number_Of_Installments__c";
+import PAYMENT_METHOD_FIELD from "@salesforce/schema/Expense__c.Payment_Method__c";
+import COUNTS_BUDGET_FIELD from "@salesforce/schema/Expense__c.Counts_Toward_Budget__c";
+import COUNTS_SPENDING_FIELD from "@salesforce/schema/Expense__c.Counts_Toward_Spending__c";
 
 const MONTH_NAMES = [
   "ene",
@@ -31,6 +34,8 @@ const MONTH_NAMES = [
 
 export default class ExpenseFormModal extends LightningModal {
   @api expenseId;
+  /** "budget" (default) or "spending" */
+  @api mode = "budget";
 
   expenseDescription = "";
   purchaseDate;
@@ -38,6 +43,8 @@ export default class ExpenseFormModal extends LightningModal {
   numberOfInstallments = "1";
   category;
   person;
+  paymentMethod = "Efectivo";
+  alsoCountsTowardBudget = false;
   isSaving = false;
   isLoading = false;
   isScanning = false;
@@ -46,6 +53,7 @@ export default class ExpenseFormModal extends LightningModal {
   categoryOptions = [];
   personOptions = [];
   installmentsOptions = [];
+  paymentMethodOptions = [];
 
   receiptBase64;
   receiptMimeType;
@@ -73,7 +81,10 @@ export default class ExpenseFormModal extends LightningModal {
       TOTAL_AMOUNT_FIELD,
       INSTALLMENTS_FIELD,
       CATEGORY_FIELD,
-      PERSON_FIELD
+      PERSON_FIELD,
+      PAYMENT_METHOD_FIELD,
+      COUNTS_BUDGET_FIELD,
+      COUNTS_SPENDING_FIELD
     ]
   })
   wiredExpense({ data, error }) {
@@ -84,6 +95,10 @@ export default class ExpenseFormModal extends LightningModal {
       this.numberOfInstallments = data.fields.Number_Of_Installments__c.value;
       this.category = data.fields.Category__c.value;
       this.person = data.fields.Person__c.value;
+      this.paymentMethod =
+        data.fields.Payment_Method__c?.value || this.paymentMethod;
+      this.alsoCountsTowardBudget =
+        data.fields.Counts_Toward_Budget__c?.value === true;
       this.isLoading = false;
     } else if (error) {
       this.notifyError(error);
@@ -135,12 +150,44 @@ export default class ExpenseFormModal extends LightningModal {
     }
   }
 
+  @wire(getPicklistValues, {
+    recordTypeId: "$objectInfo.defaultRecordTypeId",
+    fieldApiName: PAYMENT_METHOD_FIELD
+  })
+  paymentMethodPicklist({ data }) {
+    if (data) {
+      this.paymentMethodOptions = data.values.map((v) => ({
+        label: v.label,
+        value: v.value
+      }));
+    }
+  }
+
   get isEdit() {
     return !!this.expenseId;
   }
 
+  get isSpendingMode() {
+    return this.mode === "spending";
+  }
+
+  get isBudgetMode() {
+    return !this.isSpendingMode;
+  }
+
   get modalTitle() {
+    if (this.isSpendingMode) {
+      return this.isEdit ? "Editar gasto" : "Nuevo gasto";
+    }
     return this.isEdit ? "Editar consumo" : "Nuevo consumo";
+  }
+
+  get showInstallments() {
+    return true;
+  }
+
+  get showInstallmentPreview() {
+    return this.installmentPreview != null;
   }
 
   get installmentPreview() {
@@ -188,6 +235,14 @@ export default class ExpenseFormModal extends LightningModal {
 
   handlePersonChange(event) {
     this.person = event.detail.value;
+  }
+
+  handlePaymentMethodChange(event) {
+    this.paymentMethod = event.detail.value;
+  }
+
+  handleAlsoBudgetChange(event) {
+    this.alsoCountsTowardBudget = event.target.checked;
   }
 
   handleCancel() {
@@ -290,6 +345,14 @@ export default class ExpenseFormModal extends LightningModal {
       [CATEGORY_FIELD.fieldApiName]: values.category || null,
       [PERSON_FIELD.fieldApiName]: values.person
     };
+    if (this.isSpendingMode) {
+      fields[PAYMENT_METHOD_FIELD.fieldApiName] = values.paymentMethod;
+      fields[COUNTS_SPENDING_FIELD.fieldApiName] = true;
+      fields[COUNTS_BUDGET_FIELD.fieldApiName] = this.alsoCountsTowardBudget;
+    } else if (!this.isEdit) {
+      fields[COUNTS_BUDGET_FIELD.fieldApiName] = true;
+      fields[COUNTS_SPENDING_FIELD.fieldApiName] = false;
+    }
     try {
       let savedExpenseId = this.expenseId;
       if (this.isEdit) {
